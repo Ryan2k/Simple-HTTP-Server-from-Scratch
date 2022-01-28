@@ -22,6 +22,10 @@
 
 using namespace std;
 
+struct threadData {
+    int sd;
+};
+
 /*
  * Takes in the number for the port that this process will be running on and tries to create an address info.
  * From there checks to see if we can make a successful connection, and if so, returns the descriptor of the
@@ -89,15 +93,15 @@ int getSocketDescriptor (char* portNumber) {
  *    e) Finally, if the server cannot understand the request - return a 400 bad request
  *       - This will happen if we get a request type other than get or if the message format is incorrect
  */
-void* handleRequest(void* sd) {
+void* handleRequest(void* data) {
     // Step 1 - Create buffer to read in the clients write call (read in the get request)
     int bufferSize = 1024; // max size of the get request is technically double this I believe but we shouldnt need that much
     char dataBuffer[bufferSize]; // where we are reading the write() call from the client containing the request (char array = string)
 
-    int socketDescriptor = (int)sd;
+    int sd = ((struct threadData*)data)->sd;
 
     // Step 2 - Read in the request to the buffer
-    read(socketDescriptor, dataBuffer, sizeof(dataBuffer)); // description of read at the bottom of this file
+    read(sd, dataBuffer, sizeof(dataBuffer)); // description of read at the bottom of this file
 
     cout << "Successfully Read in Content from the Clients Reqeust, Here are the contents: " << endl;
     cout << dataBuffer << endl;
@@ -138,7 +142,9 @@ int main (int argc, char** argv) {
 
         // if we were able to successfully accept a connection, w should now create a new thread to hanld it
         pthread_t newClientThread;
-        pthread_create(&newClientThread, NULL, handleRequest, (void*)newConnectionDescriptor);
+        struct threadData* data;
+        data->sd = newConnectionDescriptor;
+        pthread_create(&newClientThread, NULL, handleRequest, (void*)data);
     }
 }
 
