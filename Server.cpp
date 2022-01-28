@@ -26,6 +26,11 @@ struct threadData {
     int sd;
 };
 
+struct HttpResponse {
+    char* statusLine;
+    FILE* file;
+};
+
 /*
  * Takes in the number for the port that this process will be running on and tries to create an address info.
  * From there checks to see if we can make a successful connection, and if so, returns the descriptor of the
@@ -107,7 +112,30 @@ void* handleRequest(void* data) {
     read(sd, dataBuffer, bufferSize); // description of read at the bottom of this file
 
     cout << "Successfully Read in Content from the Clients Reqeust, Here are the contents: " << endl;
-    cout << dataBuffer << endl;
+    cout << dataBuffer << endl; // todo: for now I am just sending the file name but this might change
+
+    // Step 3 - Try to open the file
+    FILE* file; // where we store the results of opening the file
+    file = fopen(dataBuffer, "r"); // dataBuffer contains the file name and "r" indicates it is for reading
+
+    // Step 4 - Store the file and the status code in a variable to send over depending on the 3 outcomes listed above
+    struct HttpResponse* response = new HttpResponse;
+
+    // If the file does not hold null, it means we found it in our directory todo: not sure if this is right?
+    // So put the file in the structure and give a 200 OK status message
+    if (file == NULL) {
+        response->statusLine = "200 OK";
+        response->file = file;
+    }
+    else { 
+        response->statusLine = "404 Not Found";
+        response->file = file; // this value will just be null
+    }
+
+    // todo: not sure how to handle third case or if these two cases above are even correct
+
+    // Step 5 - Send this structure back to the client
+    write(sd, &response, 4096);
 
     close(sd);
     return NULL;
@@ -172,4 +200,9 @@ int main (int argc, char** argv) {
  *  a) The file offset is the character location within that file
  *  b) Usually starts at 0
  *  c) So if the file offset is 100, we are reading the 101st byte in the file
+ * 
+ * 3. fopen
+ *  a) Takes in a name of a file and a mode
+ *  b) 6 different modes - read, write, etc.
+ *  c) Returns a file pointer if successfull or null if unable to find the file
  */
