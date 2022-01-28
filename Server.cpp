@@ -150,10 +150,12 @@ int main (int argc, char** argv) {
 
         // if we were able to successfully accept a connection, w should now create a new thread to hanld it
         pthread_t newClientThread;
-        struct threadData* data;
+        struct threadData* data = new threadData;
         data->sd = newConnectionDescriptor;
         pthread_create(&newClientThread, NULL, handleRequest, (void*)data);
     }
+
+    return 0;
 }
 
 /*
