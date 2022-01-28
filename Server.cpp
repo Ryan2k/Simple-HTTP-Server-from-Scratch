@@ -13,7 +13,7 @@
 #include <netdb.h>        // gethostbyname 
 #include <unistd.h>       // read, write, close 
 #include <strings.h>      // bzero 
-#include <netinet/tcp.h>  // SO_REUSEADDR 
+#include <netinet/tcp.h>  // SO_REUSEADDR git pu
 #include <sys/uio.h>      // writev
 
 #include <iostream>
@@ -105,6 +105,9 @@ void* handleRequest(void* data) {
 
     cout << "Successfully Read in Content from the Clients Reqeust, Here are the contents: " << endl;
     cout << dataBuffer << endl;
+
+    close(sd);
+    return NULL;
 }
 
 int main (int argc, char** argv) {
