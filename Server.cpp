@@ -94,11 +94,14 @@ int getSocketDescriptor (char* portNumber) {
  *       - This will happen if we get a request type other than get or if the message format is incorrect
  */
 void* handleRequest(void* data) {
+    cout << "Entered handleRequest" << endl;
     // Step 1 - Create buffer to read in the clients write call (read in the get request)
     int bufferSize = 1024; // max size of the get request is technically double this I believe but we shouldnt need that much
     char dataBuffer[bufferSize]; // where we are reading the write() call from the client containing the request (char array = string)
 
     int sd = ((struct threadData*)data)->sd;
+
+    cout << "new socket descriptor: " << sd << endl;
 
     // Step 2 - Read in the request to the buffer
     read(sd, dataBuffer, sizeof(dataBuffer)); // description of read at the bottom of this file
@@ -128,7 +131,7 @@ int main (int argc, char** argv) {
     }
 
     // Once we are successfully listening, print to the console what port we are listening on and that we are
-    cout << "Listening for incoming connections on port " << portNumber << endl;
+    cout << "Listening for incoming connections on port " << portNumber << " via descriptor: " << serverSocket << endl;
 
     // Step 4 - Create an infinte loop that is listening for connections
     // If successfully able to accept the connection, create another socket to handle the connection (get request) for each client
