@@ -104,7 +104,7 @@ void* handleRequest(void* data) {
     cout << "new socket descriptor: " << sd << endl;
 
     // Step 2 - Read in the request to the buffer
-    read(sd, dataBuffer, sizeof(dataBuffer)); // description of read at the bottom of this file
+    read(sd, dataBuffer, bufferSize); // description of read at the bottom of this file
 
     cout << "Successfully Read in Content from the Clients Reqeust, Here are the contents: " << endl;
     cout << dataBuffer << endl;
