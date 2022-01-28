@@ -78,7 +78,7 @@ int getSocketDescriptor (struct addrinfo* head) {
  * 2. The name of the file we are requesting from the server
  */
 void handleRequest(int clientSocket, void* requestMessage) {
-    write(clientSocket, requestMessage, sizeof(requestMessage));
+    write(clientSocket, requestMessage, 1024); // if you use sizeof(request message), it just returns 8 (size of pointer) so can only send 8 chars
 }
 
 int main (int argc, char** argv) {
