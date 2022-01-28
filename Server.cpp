@@ -137,6 +137,8 @@ void* handleRequest(void* data) {
     // Step 5 - Send this structure back to the client
     write(sd, &response, 4096);
 
+    cout << "Made it to post write" << endl;
+
     close(sd);
     return NULL;
 }

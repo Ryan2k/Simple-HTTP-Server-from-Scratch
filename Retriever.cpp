@@ -79,6 +79,14 @@ int getSocketDescriptor (struct addrinfo* head) {
  */
 void handleRequest(int clientSocket, void* requestMessage) {
     write(clientSocket, requestMessage, 1024); // if you use sizeof(request message), it just returns 8 (size of pointer) so can only send 8 chars
+
+    char response[4096]; // buffer that reads in the reponse
+
+    read(clientSocket, response, 4096);
+
+    cout << "succesfully read in a response" << endl;
+
+    // todo: convert this back into the HttpResponse object like the server program
 }
 
 int main (int argc, char** argv) {
