@@ -87,6 +87,7 @@ void handleRequest(int clientSocket, void* requestMessage) {
     cout << "succesfully read in a response" << endl;
 
     // todo: convert this back into the HttpResponse object like the server program
+    cout << response << endl;
 }
 
 int main (int argc, char** argv) {
