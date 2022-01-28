@@ -146,6 +146,8 @@ int main (int argc, char** argv) {
             // cout << "Failed to accept connection request form client address " << clientAddress << endl;
         }
 
+        cout << "Accepted a connection which is being handled through new descriptor: " << newConnectionDescriptor << endl;
+
         // if we were able to successfully accept a connection, w should now create a new thread to hanld it
         pthread_t newClientThread;
         struct threadData* data;
