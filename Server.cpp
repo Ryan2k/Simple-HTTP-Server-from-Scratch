@@ -94,8 +94,10 @@ void* handleRequest(void* sd) {
     int bufferSize = 1024; // max size of the get request is technically double this I believe but we shouldnt need that much
     char dataBuffer[bufferSize]; // where we are reading the write() call from the client containing the request (char array = string)
 
+    int socketDescriptor = (int)sd;
+
     // Step 2 - Read in the request to the buffer
-    read((int)sd, dataBuffer, sizeof(dataBuffer)); // description of read at the bottom of this file
+    read(socketDescriptor, dataBuffer, sizeof(dataBuffer)); // description of read at the bottom of this file
 
     cout << "Successfully Read in Content from the Clients Reqeust, Here are the contents: " << endl;
     cout << dataBuffer << endl;
