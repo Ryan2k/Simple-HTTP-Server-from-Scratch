@@ -5,7 +5,6 @@
  * 404 Not Found code along with a custom "File Not Found" page. Each of these accepted connections are going to be handled
  * by a seperate thread. Once a request is handled, it should keep listening for others.
  */
-
 #include <sys/types.h>    // socket, bind 
 #include <sys/socket.h>   // socket, bind, listen, inet_ntoa 
 #include <netinet/in.h>   // htonl, htons, inet
@@ -18,7 +17,10 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
 #include <cstring> // needed for memset
+#include <fstream>
+
 
 using namespace std;
 
@@ -30,6 +32,8 @@ struct HttpResponse {
     char* statusLine;
     FILE* file;
 };
+
+const char* HTTP_RESPONSE_FORMAT_OUT = "(%s, %s)\n";
 
 /*
  * Takes in the number for the port that this process will be running on and tries to create an address info.
@@ -116,7 +120,7 @@ void* handleRequest(void* data) {
 
     // Step 3 - Try to open the file
     FILE* file; // where we store the results of opening the file
-    file = fopen(dataBuffer, "r"); // dataBuffer contains the file name and "r" indicates it is for reading
+    file = fopen(dataBuffer, "r"); // dataBuffer contains the file name and "r" indicates it is for reading (file pointer points to first location)
 
     // Step 4 - Store the file and the status code in a variable to send over depending on the 3 outcomes listed above
     struct HttpResponse* response = new HttpResponse;
@@ -132,9 +136,42 @@ void* handleRequest(void* data) {
         response->file = file; // this value will just be null
     }
 
+    // Step 5 - Store this response structure we just created to a file
+    FILE* responseFile;
+    fopen("response.dat", "w+"); // creates a new file called response.dat
+
+    if (file == NULL) {
+        cout << "Couldnt open a file response.dat" << endl;
+        exit (EXIT_FAILURE);
+    }
+
+    fprintf(responseFile, HTTP_RESPONSE_FORMAT_OUT, response->statusLine, response->file); // write the structure to the file with the specified format
+    fseek(responseFile, 0, SEEK_SET); // sets the pointer to the file to the begining
+
     // todo: not sure how to handle third case or if these two cases above are even correct
 
-    // Step 5 - Send this structure back to the client
+    // for testing purposes display the file contents to screen (need to do this on client side)
+    char fname[25]; // name of file we are displaying (response.dat)
+    char line[80]; // to print each line of the file
+    ifstream fin; // file stream object
+    fin.open("response.dat", ios::in); //open the file in input mode
+
+    if(!fin) { //file does not exist
+        cout << "file does not exist" << endl;
+        exit (EXIT_FAILURE);
+    }
+
+    cout << "Contents of response.dat" << endl;
+
+    // read data from file upto end of file
+    while (fin.eof() == 0) {
+        fin.getline(line, sizeof(line));
+        cout << line << endl;
+    }
+
+    fin.close(); // close the file
+
+    // Step 6 - Send this structure back to the client
     write(sd, &response, 4096);
 
     cout << "Made it to post write" << endl;
@@ -144,8 +181,8 @@ void* handleRequest(void* data) {
 }
 
 int main (int argc, char** argv) {
-    // Step 1 - Grab the port number the user would like our process to be running on
-    char* portNumber = argv[1];
+    // Step 1 - Hard code a port number for the process that is listening for connections
+    char* portNumber = "2648"; // just using my last 4 for student ID again
 
     // Step 2 - Create a socket for this process to listen for requests on
     int serverSocket = getSocketDescriptor(portNumber);
