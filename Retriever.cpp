@@ -133,16 +133,14 @@ int main (int argc, char** argv) {
         exit (EXIT_FAILURE);
     }
 
-    for (int i = 1; i < 6; i++) {
-        cout << "argv at " << i << ": " << argv[i] << endl;
-    }
-
     // turn the arguments into a single string to send to the server
     char* httpRequest = argv[1];
 
     for (int i = 2; i <= 5; i++) {
+        cout << "argv at " << i << ": " << argv[i] << endl;
         strcat(httpRequest, " ");
         strcat(httpRequest, argv[i]);
+        cout << "Http Request: " << httpRequest << endl;
     }
 
     cout << "Http Request: " << httpRequest << endl; // for debugging
