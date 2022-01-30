@@ -122,9 +122,11 @@ void handleRequest(int clientSocket, void* requestMessage) {
  */
 int main (int argc, char** argv) {
     char* serverPortNumber = "8080"; // hard coded (http request generally use 80)
-    char* serverHostName = argv[5]; // domainname.com from example above
+    //char* serverHostName = argv[5]; // domainname.com from example above
 
-    cout << "Server host name in main: " << serverHostName << endl;
+    //cout << "Server host name in main: " << serverHostName << endl;
+
+    /*
 
     // if the input is not in the format of 5 space seperated strings, the request format is incorrect
     if (argc != 6) { // 6 actuall arguments as argv[0] is filename
@@ -136,6 +138,8 @@ int main (int argc, char** argv) {
     // turn the arguments into a single string to send to the server
     char* httpRequest = argv[1];
 
+    // todo: fix this
+
     for (int i = 2; i <= 5; i++) {
         cout << "argv at " << i << ": " << argv[i] << endl;
         strcat(httpRequest, " ");
@@ -145,9 +149,14 @@ int main (int argc, char** argv) {
 
     cout << "Http Request: " << httpRequest << endl; // for debugging
 
+    */
+
+    char* serverHostName = "csslab11.uwb.edu";
+    char* httpRequest = "GET /samplefile.txt HTTP/1.1 Host: csslab11.uwb.edu";
+
 
     // grab the linked list of address guesses we can obtain with the given port number and hostname/ ip address
-    struct addrinfo* addressGuessHead = getAddressGuesses(serverPortNumber, argv[5]);
+    struct addrinfo* addressGuessHead = getAddressGuesses(serverPortNumber, serverHostName);
 
     // from those guesses, see if we can successfully make a connection
     // if so, grab the file descriptor of the socket we just opened
