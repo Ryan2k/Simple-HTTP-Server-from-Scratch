@@ -52,8 +52,8 @@ struct addrinfo* getAddressGuesses (char* port, char* hostName) {
 
     struct addrinfo* resultHead; // stores the address of the first addrinfo guess in the results linked list
 
-    // cout << "Hostname: " << hostName << endl; //debugging
-    // cout << "Port Number: " << port << endl; //debugging
+    cout << "Hostname: " << hostName << endl; //debugging
+    cout << "Port Number: " << port << endl; //debugging
 
     int status = getaddrinfo(hostName, port, &hints, &resultHead); // creates the linked list and returns 0 if successful
 
