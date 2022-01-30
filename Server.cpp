@@ -183,7 +183,7 @@ void* handleRequest(void* data) {
 
 int main (int argc, char** argv) {
     // Step 1 - Hard code a port number for the process that is listening for connections
-    char* portNumber = "2648"; // just using my last 4 for student ID again
+    char* portNumber = "8080"; // http requests generally port 80
 
     // Step 2 - Create a socket for this process to listen for requests on
     int serverSocket = getSocketDescriptor(portNumber);
