@@ -132,7 +132,7 @@ void* handleRequest(void* data) {
     currString = strtok(NULL, " /"); // Grabs the next space seperated string from the buffer (also with a slash as the format is /index.html)
     char* fileName = currString;
 
-    cout << fileName << endl;
+    cout << "fileName: " << fileName << endl;
 
 
 

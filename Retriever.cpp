@@ -141,11 +141,8 @@ int main (int argc, char** argv) {
     char* httpRequest = argv[1];
 
     for (int i = 2; i <= 5; i++) {
+        strcat(httpRequest, " ");
         strcat(httpRequest, argv[i]);
-
-        if (i != 5) {
-            strcat(httpRequest, " ");
-        }
     }
 
     cout << "Http Request: " << httpRequest << endl; // for debugging
