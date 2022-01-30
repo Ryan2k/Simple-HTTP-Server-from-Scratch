@@ -163,9 +163,13 @@ void* handleRequest(void* data) {
         exit (EXIT_FAILURE);
     }
 
+    write(sd, (void*)file, 4096); // just for testing
+
     cout << "created response.dat" << endl;
 
     fwrite(&response, sizeof(struct HttpResponse), 1, responseFile);
+
+    cout << "successfully wrote to response file" << endl;
 
     //fprintf(responseFile, HTTP_RESPONSE_FORMAT_OUT, response->statusLine, response->file); // write the structure to the file with the specified format
     //fseek(responseFile, 0, SEEK_SET); // sets the pointer to the file to the begining
