@@ -118,11 +118,29 @@ void* handleRequest(void* data) {
     cout << "Successfully Read in Content from the Clients Reqeust, Here are the contents: " << endl;
     cout << dataBuffer << endl; // todo: for now I am just sending the file name but this might change
 
-    // Step 3 - Try to open the file
-    FILE* file; // where we store the results of opening the file
-    file = fopen(dataBuffer, "r"); // dataBuffer contains the file name and "r" indicates it is for reading (file pointer points to first location)
+    // Step 3 - Extract Individual Values from Http Request String (the value inside databuffer)
+    char* currString;
+    currString = strtok(dataBuffer, " ");
 
-    // Step 4 - Store the file and the status code in a variable to send over depending on the 3 outcomes listed above
+    cout << "Request Type: " << currString << endl; // for debugging purposes
+
+    // if the first string is not GET, return a 400 bad request as we only are able to support GET with this program
+    if (strcmp(currString, "GET") != 0) {
+
+    }
+
+    currString = strtok(NULL, " /"); // Grabs the next space seperated string from the buffer (also with a slash as the format is /index.html)
+    char* fileName = currString;
+
+    cout << fileName << endl;
+
+
+
+    // Step 4 - Try to open the file
+    FILE* file; // where we store the results of opening the file
+    file = fopen(fileName, "r"); // fileName contains the file name and "r" indicates it is for reading (file pointer points to first location)
+
+    // Step 5 - Store the file and the status code in a variable to send over depending on the 3 outcomes listed above
     struct HttpResponse* response = new HttpResponse;
 
     // If the file does not hold null, it means we found it in our directory todo: not sure if this is right?
@@ -136,7 +154,7 @@ void* handleRequest(void* data) {
         response->file = file; // this value will just be null
     }
 
-    // Step 5 - Store this response structure we just created to a file
+    // Step 6 - Store this response structure we just created to a file
     FILE* responseFile;
     fopen("response.dat", "w+"); // creates a new file called response.dat
 
@@ -145,33 +163,16 @@ void* handleRequest(void* data) {
         exit (EXIT_FAILURE);
     }
 
-    fprintf(responseFile, HTTP_RESPONSE_FORMAT_OUT, response->statusLine, response->file); // write the structure to the file with the specified format
-    fseek(responseFile, 0, SEEK_SET); // sets the pointer to the file to the begining
+    cout << "created response.dat" << endl;
+
+    fwrite(&response, sizeof(struct HttpResponse), 1, responseFile);
+
+    //fprintf(responseFile, HTTP_RESPONSE_FORMAT_OUT, response->statusLine, response->file); // write the structure to the file with the specified format
+    //fseek(responseFile, 0, SEEK_SET); // sets the pointer to the file to the begining
 
     // todo: not sure how to handle third case or if these two cases above are even correct
 
-    // for testing purposes display the file contents to screen (need to do this on client side)
-    char fname[25]; // name of file we are displaying (response.dat)
-    char line[80]; // to print each line of the file
-    ifstream fin; // file stream object
-    fin.open("response.dat", ios::in); //open the file in input mode
-
-    if(!fin) { //file does not exist
-        cout << "file does not exist" << endl;
-        exit (EXIT_FAILURE);
-    }
-
-    cout << "Contents of response.dat" << endl;
-
-    // read data from file upto end of file
-    while (fin.eof() == 0) {
-        fin.getline(line, sizeof(line));
-        cout << line << endl;
-    }
-
-    fin.close(); // close the file
-
-    // Step 6 - Send this structure back to the client
+    // Step 7 - Send this structure back to the client
     write(sd, &response, 4096);
 
     cout << "Made it to post write" << endl;

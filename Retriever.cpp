@@ -17,8 +17,31 @@
 #include <iostream>
 #include <stdio.h>
 #include <cstring> // needed for memset
+#include <fstream>
 
 using namespace std;
+
+void displayFileToScreen(FILE* httpResponse) {
+    char fname[25]; // name of file we are displaying (response.dat)
+    char line[80]; // to print each line of the file
+    ifstream fin; // file stream object
+    fin.open("response.dat", ios::in); //open the file in input mode
+
+    if(!fin) { //file does not exist
+        cout << "file does not exist" << endl;
+        exit (EXIT_FAILURE);
+    }
+
+    cout << "Contents of response.dat" << endl;
+
+    // read data from file upto end of file
+    while (fin.eof() == 0) {
+        fin.getline(line, sizeof(line));
+        cout << line << endl;
+    }
+
+    fin.close(); // close the file
+}
 
 struct addrinfo* getAddressGuesses (char* port, char* hostName) {
     struct addrinfo hints; // gives hints to the getaddrinfo() function in order to retreive the correct addressinfo
@@ -90,10 +113,31 @@ void handleRequest(int clientSocket, void* requestMessage) {
     cout << response << endl;
 }
 
+/*
+ * This function handles taking in the input from the command line and parsing.
+ * Then, it uses the parsed information to retreived a socket, and that to make a request.
+ * Command line argument input format example: GET /index.html HTTP/1.1 Host: domainname.com
+ */
 int main (int argc, char** argv) {
-    char* serverPortNumber = argv[1];
-    char* serverHostName = argv[2];
-    char* requestingFileName = argv[3];
+    char* serverPortNumber = "8080"; // hard coded (http request generally use 80)
+    char* serverHostName = argv[5]; // domainname.com from example above
+
+    // if the input is not in the format of 5 space seperated strings, the request format is incorrect
+    if (argc != 5) {
+        cout << "Incorrect request format. A GET request must have 5 space seperated arguments" << endl;
+        cout << "For example: GET /index.html HTTP/1.1 Host: domainname.com" << endl;
+        exit (EXIT_FAILURE);
+    }
+
+    // turn the arguments into a single string to send to the server
+    char* httpRequest = argv[1];
+
+    for (int i = 2; i <= 5; i++) {
+        strcat(httpRequest, argv[i]);
+    }
+
+    cout << "Http Request: " << httpRequest << endl; // for debugging
+
 
     // grab the linked list of address guesses we can obtain with the given port number and hostname/ ip address
     struct addrinfo* addressGuessHead = getAddressGuesses(serverPortNumber, serverHostName);
@@ -102,7 +146,7 @@ int main (int argc, char** argv) {
     // if so, grab the file descriptor of the socket we just opened
     int clientSocket = getSocketDescriptor(addressGuessHead);
 
-    handleRequest(clientSocket, (void*)requestingFileName);
+    handleRequest(clientSocket, (void*)httpRequest);
 
     return 0;
 }
