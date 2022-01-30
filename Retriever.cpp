@@ -55,7 +55,9 @@ struct addrinfo* getAddressGuesses (char* port, char* hostName) {
     cout << "Hostname: " << hostName << endl; //debugging
     cout << "Port Number: " << port << endl; //debugging
 
-    int status = getaddrinfo(hostName, port, &hints, &resultHead); // creates the linked list and returns 0 if successful
+    char* hardCodedHost = "csslab11.uwb.edu"; // todp: figure out why first char of hostname is getting deleted
+
+    int status = getaddrinfo(hardCodedHost, port, &hints, &resultHead); // creates the linked list and returns 0 if successful
 
     if (status != 0) {
         cout << "could not formulate any guesses based on host name and port number" << endl;
