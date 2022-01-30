@@ -122,6 +122,8 @@ int main (int argc, char** argv) {
     char* serverPortNumber = "8080"; // hard coded (http request generally use 80)
     char* serverHostName = argv[5]; // domainname.com from example above
 
+    cout << "Server host name in main: " << serverHostName << endl;
+
     // if the input is not in the format of 5 space seperated strings, the request format is incorrect
     if (argc != 6) { // 6 actuall arguments as argv[0] is filename
         cout << "Incorrect request format. A GET request must have 5 space seperated arguments" << endl;
@@ -148,7 +150,7 @@ int main (int argc, char** argv) {
 
 
     // grab the linked list of address guesses we can obtain with the given port number and hostname/ ip address
-    struct addrinfo* addressGuessHead = getAddressGuesses(serverPortNumber, serverHostName);
+    struct addrinfo* addressGuessHead = getAddressGuesses(serverPortNumber, argv[5]);
 
     // from those guesses, see if we can successfully make a connection
     // if so, grab the file descriptor of the socket we just opened
