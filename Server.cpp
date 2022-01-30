@@ -173,7 +173,7 @@ void* handleRequest(void* data) {
     // todo: not sure how to handle third case or if these two cases above are even correct
 
     // Step 7 - Send this structure back to the client
-    write(sd, &response, 4096);
+    write(sd, &responseFile, 4096);
 
     cout << "Made it to post write" << endl;
 
