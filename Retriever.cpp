@@ -129,6 +129,10 @@ int main (int argc, char** argv) {
         exit (EXIT_FAILURE);
     }
 
+    for (int i = 1; i < 6; i++) {
+        cout << "argv at " << i << ": " << argv[i] << endl;
+    }
+
     // turn the arguments into a single string to send to the server
     char* httpRequest = argv[1];
 
