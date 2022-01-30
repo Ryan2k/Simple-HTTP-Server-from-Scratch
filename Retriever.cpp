@@ -123,7 +123,7 @@ int main (int argc, char** argv) {
     char* serverHostName = argv[5]; // domainname.com from example above
 
     // if the input is not in the format of 5 space seperated strings, the request format is incorrect
-    if (argc != 5) {
+    if (argc != 6) { // 6 actuall arguments as argv[0] is filename
         cout << "Incorrect request format. A GET request must have 5 space seperated arguments" << endl;
         cout << "For example: GET /index.html HTTP/1.1 Host: domainname.com" << endl;
         exit (EXIT_FAILURE);
