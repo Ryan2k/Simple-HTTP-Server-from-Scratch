@@ -117,4 +117,7 @@ int main (int argc, char** argv) {
 
     // Step 3 - Create a socket between the current program (the client) and the program running on the server
     int clientSocket = createSocket();
+
+    // Step 4 - Send the request (Description over the sendRequest Method)
+    sendRequest(clientSocket, argv);
 }
