@@ -22,6 +22,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <arpa/inet.h>
+#include <sstream> // neede for string stream
 
 
 using namespace std;
@@ -35,6 +36,7 @@ struct threadData {
 /**
  * Takes in the descriptor of the socket between the communication thread and the client
  * Runs through each line of the request header and formats it to a way the handlRequest() can work with
+ * Pretty much just concattenates each character in a line to a string and once we get to new line, it breaks and returns
  */
 string formatHeader(int comSocket) {
     cout << "Entered formatHeader()" << endl;
@@ -63,10 +65,38 @@ string formatHeader(int comSocket) {
 
 void* handleRequest(void* data) {
     cout << "Entered handleRequest" << endl;
+
+    string fileName = ""; // eventually will extract the name of the file from the data buffer if possible
+
+    // Step 1 - Extract the communication socket from the standardized void* thread function input
     int communicationSocket = ((struct threadData*)data)->sd; // socket of the current thread and the client program
 
-    string header = formatHeader(communicationSocket);
-    cout << header << endl;
+    // Step 2 - Loop through every line of the request, grabbing the header, and
+    string currLine = " "; // keeps track of the current line of the request we are in
+
+    int lineCounter = 1;
+    
+    while (1) {
+        cout << "Entering Line: " << lineCounter << endl;
+        lineCounter++;
+        currLine = formatHeader(communicationSocket);
+
+        // if the current line doesnt have any content, we have reached the end of the buffer
+        if (currLine == "") {
+            break;
+        }
+
+        if (currLine.substr(0, 3) == "GET") {
+            istringstream input(currLine); // allows us to access the string in a stream format like cin
+            string code;
+            input >> code >> fileName;
+            fileName = fileName.substr(1, fileName.length()); // the file name will have a '/' before it so need to remove that
+
+            // for debugging:
+            cout << "fileName: " << fileName << endl;
+            cout << "code: " << code << endl;
+        }
+    }
 
     return NULL;
 }
@@ -175,3 +205,29 @@ int main (int argc, char** argv) {
     return 0;
 
 }
+
+/*
+ * Notes
+ * 1. Read System Call
+ *  a) First argument is a descriptor for the file it is going to start reading from
+ *  b) The second is the buffer it is going to read the content into
+ *  c) The third is the maximum number of bytes it will attempt to read
+ *  d) It starts at the byte that is supplied by the second argument
+ *  e) If the file offset is at or past the end of the file, no bytes are read and read() returns 0
+ *  f) On success, the number of bytes read is returned, and the file position is advanced by this number
+ * 
+ * 2. File Offset
+ *  a) The file offset is the character location within that file
+ *  b) Usually starts at 0
+ *  c) So if the file offset is 100, we are reading the 101st byte in the file
+ * 
+ * 3. fopen
+ *  a) Takes in a name of a file and a mode
+ *  b) 6 different modes - read, write, etc.
+ *  c) Returns a file pointer if successfull or null if unable to find the file
+ * 
+ * 4. istringstream
+ *  a) Allows us to read from the string as if it wer like cin
+ *  b) It basically allows a sequence of contiguous characters and access to individual parts like a indice
+ *  c) But in the format of a string object
+ */
