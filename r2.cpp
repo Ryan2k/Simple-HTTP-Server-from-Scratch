@@ -72,6 +72,34 @@ int createSocket() {
     exit(EXIT_FAILURE);
 }
 
+void sendRequest(int clientSocket, char** argv) {
+    // Step 1 - Format the request in the propper way
+    // Http Requests are formatted in the way described in main, however, it is in two seperate lines as shown below
+    string requestString = string(argv[1]) + string(argv[2]) + string(argv[3]) + "\r\n" + string(argv[4]) + string(argv[5]) + "\r\n\r\n";
+    cout << "Request Format as String: " << endl;
+    cout << requestString << endl;
+
+    // convert it back to a character array to be able to use the write sys call
+    // other alternative was to use str.cpy to save a tiny amount of memory but it wasnt working with the slashes
+    int rLen = requestString.length();
+    char httpRequest[rLen + 1];
+    strcpy(httpRequest, requestString.c_str());
+
+    cout << "Http Request: " << endl;
+    cout << httpRequest << endl;
+
+    // Step 2 - Write the request to the socket
+    // Instead of a file descriptor, can simply use the socket descriptor
+    // 3rd argument is the max amount of bytes to write but this should never come close to 1024
+    int numBytesWritten = write(clientSocket, httpRequest, 1024);
+
+    if (numBytesWritten < 0) { // -1 means that the write failed so dont continue program
+        cout << "Failed writing request to socket" << endl;
+        exit (EXIT_FAILURE);
+    }
+
+}
+
 int main (int argc, char** argv) {
     // Step 1 - Verify validity of the input
     if (argc != 6) {
