@@ -1,3 +1,9 @@
+/*
+ * This program will take in as input a server address and file name and send a GET request to the server to
+ * retrieve the file with the given name. If the request is successful and the response sends back the file,
+ * the file will be saved to this system and displayed to the screen.
+ */
+
 #include <sys/types.h>    // socket, bind 
 #include <sys/socket.h>   // socket, bind, listen, inet_ntoa 
 #include <netinet/in.h>   // htonl, htons, inet
@@ -77,7 +83,7 @@ int createSocket() {
 void sendRequest(int clientSocket, char** argv) {
     // Step 1 - Format the request in the propper way
     // Http Requests are formatted in the way described in main, however, it is in two seperate lines as shown below
-    string requestString = string(argv[1]) + string(argv[2]) + string(argv[3]) + "\r\n" + string(argv[4]) + string(argv[5]) + "\r\n\r\n";
+    string requestString = string(argv[1]) + " " + string(argv[2]) + " " + string(argv[3]) + "\r\n" + string(argv[4]) + " " + string(argv[5]) + "\r\n\r\n";
     cout << "Request Format as String: " << endl;
     cout << requestString << endl;
 
@@ -116,10 +122,6 @@ int main (int argc, char** argv) {
     // and parse out the hostname from the input (should always be argv[5] as argv[0] is the filename and hostname is the 5th string)
     portNumber = "8080";
     hostName = argv[5];
-
-    cout << "port number: " << portNumber << endl;
-    cout << "host name: " << hostName << "!" << endl;
-
 
     // Step 3 - Create a socket between the current program (the client) and the program running on the server
     int clientSocket = createSocket();
