@@ -77,7 +77,7 @@ string formatHeader(int comSocket) {
  *      - This will happen if we get a request type other than get or if the message format is incorrect
  */
 void createResponse(string fileName, string& status, string& data) {
-    cout << "Entered createResponse()" << endl;
+    cout << "Entered createResponse() and looking for file: " << fileName << endl;
     // Step 1 - Initialize the variables that will go in the structure
     FILE* file;
 
@@ -91,12 +91,16 @@ void createResponse(string fileName, string& status, string& data) {
         // a) set the status code
         status = "HTTP/1.1 404 Not Found\r\n";
 
+        cout << "File Not Found" << endl;
+
         // b) open the file I created and put in the directory to display for "not found" errors
         file = fopen("filenotfound.html", "r");
     }
     else { // Outcome 2 - File was found, so just set the status to success
         status = "HTTP/1.1 200 OK\r\n";
     }
+
+    cout << "opened file and now starting to read " << endl;
 
     // Step 4 - Write the contents of the file to the string, data. This will represent the payload
 
@@ -107,8 +111,11 @@ void createResponse(string fileName, string& status, string& data) {
             continue;
         }
 
-        curr += '\n';
+        data += curr;
     }
+
+    cout << "Finished Reading File" << endl;
+    cout << data << endl;
 
     // Step 5 - Finally, close the file
 
