@@ -126,7 +126,7 @@ int getSocketDescriptor () {
 }
 
 int main (int argc, char** argv) {
-    if (argc > 0) {
+    if (argc > 1) {
         cout << "There should not be any arguments supplied with this program!" << endl;
         exit (EXIT_FAILURE);
     }
