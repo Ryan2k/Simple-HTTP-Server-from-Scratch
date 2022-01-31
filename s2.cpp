@@ -180,6 +180,11 @@ void* handleRequest(void* data) {
 
     string httpResponse = status + "Content_Length: " + contentLength + "\r\n" + "Content-Type: text/html\r\n\r\n" + payload;
 
+    cout << " " << endl;
+    cout << "Full Http Resonse: " << endl;
+    cout << " " << endl;
+    cout << httpResponse << endl;
+
     // Step 4 - Send the newly formatted http response
     // the second argument is a void* for a buffer so need to get the pointer to the first character bytes memory address of the response
     send(communicationSocket, &httpResponse[0], httpResponse.size(), 0);
