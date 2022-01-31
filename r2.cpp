@@ -26,6 +26,7 @@ char* fileName;
  */
 int createSocket() {
     // For Debugging
+    cout << "Entered createSocket()" << endl;
     cout << "port number: " << portNumber << endl;
     cout << "host name: " << hostName << "!" << endl;
 
@@ -115,6 +116,10 @@ int main (int argc, char** argv) {
     // and parse out the hostname from the input (should always be argv[5] as argv[0] is the filename and hostname is the 5th string)
     char* portNumber = "8080";
     char* hostName = argv[5];
+
+    cout << "port number: " << portNumber << endl;
+    cout << "host name: " << hostName << "!" << endl;
+
 
     // Step 3 - Create a socket between the current program (the client) and the program running on the server
     int clientSocket = createSocket();
