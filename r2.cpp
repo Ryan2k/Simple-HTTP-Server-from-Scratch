@@ -26,7 +26,8 @@ char* fileName;
  */
 int createSocket() {
     // For Debugging
-    cout << "port number: " << portNumber << ", host name: " << hostName << "!" << endl;
+    cout << "port number: " << portNumber << endl;
+    cout << "host name: " << hostName << "!" << endl;
 
     int clientSocket; // return value of the descriptor for the socket we are going to create
 
