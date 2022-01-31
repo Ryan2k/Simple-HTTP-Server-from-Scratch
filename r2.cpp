@@ -27,7 +27,6 @@ int createSocket(char* portNumber, char* hostName) {
 
     // Step 1 - Use the getaddrinfo() function supplied by socket.h to get a linked list of guesses
     // for where the hosts address is. To do that, need to supply it hints
-    struct addrinfo hints;
     struct addrinfo hints; // gives hints to the getaddrinfo() function in order to retreive the correct addressinfo
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET; // says that the address is of the internet family (ipv4 or ipv6)
