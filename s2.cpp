@@ -67,6 +67,8 @@ void* handleRequest(void* data) {
 
     string header = formatHeader(communicationSocket);
     cout << header << endl;
+
+    return NULL;
 }
 
 /*
