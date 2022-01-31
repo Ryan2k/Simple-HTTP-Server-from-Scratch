@@ -15,11 +15,16 @@
 
 using namespace std;
 
+// Global Variables - values given in main()
+char* portNumber;
+char* hostName;
+char* fileName;
+
 /**
  * Takes in the port number and the host name of the server and creates a socket between our
  * current process and the process listening on the specified port and hostname
  */
-int createSocket(char* portNumber, char* hostName) {
+int createSocket() {
     // For Debugging
     cout << "port number: " << portNumber << ", host name: " << hostName << "!" << endl;
 
@@ -83,5 +88,5 @@ int main (int argc, char** argv) {
     char* hostName = argv[5];
 
     // Step 3 - Create a socket between the current program (the client) and the program running on the server
-    int clientSocket = createSocket(portNumber, hostName);
+    int clientSocket = createSocket();
 }
