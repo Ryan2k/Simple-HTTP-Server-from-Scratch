@@ -106,6 +106,8 @@ void sendFile(FILE* filePointer, int socket) {
 
         bzero(data, 1024);
     }
+
+    cout << "Successfully sent file!" << endl;
 }
 
 /*

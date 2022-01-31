@@ -102,14 +102,37 @@ int getSocketDescriptor (struct addrinfo* head) {
  * 1. The descriptor of the open socket connection we have between our current process and the process running on the server
  * 2. The name of the file we are requesting from the server
  */
-void handleRequest(int clientSocket, void* requestMessage) {
+void handleRequest(int clientSocket, void* requestMessage, char* fileName) {
     write(clientSocket, requestMessage, 1024); // if you use sizeof(request message), it just returns 8 (size of pointer) so can only send 8 chars
 
-    char response[4096]; // buffer that reads in the reponse
+    char response[1024]; // buffer that reads in the reponse
 
     // create the file we are reading from the server
     FILE *file;
-    char* fileName;
+    int n;
+
+    file = fopen(fileName, "w");
+
+    if (file == NULL) {
+        cout << "Error reading in file from server on client" << endl;
+        exit (EXIT_FAILURE);
+    }
+
+    // start reading in file
+    while (1) { // infinite loop, we break it once done
+        n = recv(clientSocket, response, 1024, 0);
+
+        if (n <= 0) { // if it didnt make any reads or resulted in error
+            break;
+        }
+
+        cout << response << endl;
+
+        fprintf(file, "%s", response); // prints output of last 1024 bytes of the file to the new file
+        bzero(response, 1024);
+    }
+
+    cout << "File written successfully" << endl;
 
     //read(clientSocket, response, 4096);
 
@@ -157,6 +180,7 @@ int main (int argc, char** argv) {
 
     char* serverHostName = "csslab11.uwb.edu";
     char* httpRequest = "GET /samplefile.txt HTTP/1.1 Host: csslab11.uwb.edu";
+    char* fileName = "samplefile.txt";
 
 
     // grab the linked list of address guesses we can obtain with the given port number and hostname/ ip address
@@ -166,7 +190,7 @@ int main (int argc, char** argv) {
     // if so, grab the file descriptor of the socket we just opened
     int clientSocket = getSocketDescriptor(addressGuessHead);
 
-    handleRequest(clientSocket, (void*)httpRequest);
+    handleRequest(clientSocket, (void*)httpRequest, fileName);
 
     return 0;
 }
