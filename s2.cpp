@@ -39,7 +39,6 @@ struct threadData {
  * Pretty much just concattenates each character in a line to a string and once we get to new line, it breaks and returns
  */
 string formatHeader(int comSocket) {
-    cout << "Entered formatHeader()" << endl;
     string result;
     char prev = 0;
 
@@ -60,6 +59,7 @@ string formatHeader(int comSocket) {
         prev = curr;
     }
 
+    cout << "Formatted Header: " << result << endl;
     return result;
 }
 
