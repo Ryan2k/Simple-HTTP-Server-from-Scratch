@@ -20,6 +20,8 @@
 #include <string.h>
 #include <cstring> // needed for memset
 #include <fstream>
+#include <stdlib.h>
+#include <arpa/inet.h>
 
 
 using namespace std;
@@ -89,6 +91,23 @@ int getSocketDescriptor (char* portNumber) {
     exit (EXIT_FAILURE);
 }
 
+/**
+ * Takes in the pointer to the file we read in along with the socket with the connection to the client
+ * we are currently serving, and sends the file over to the client over the socket.
+ */
+void sendFile(FILE* filePointer, int socket) {
+    char data[1024] = {0};
+
+    while (fgets(data, 1024, filePointer) != 0) {
+        if (send(socket, data, 1024, 0) == -1) {
+            cout << "Error Sending Data" << endl;
+            exit (EXIT_FAILURE);
+        }
+
+        bzero(data, 1024);
+    }
+}
+
 /*
  * This function takes in a socket descriptor for the new connection we create at the bottom of the function below
  * and is ran by a new thread. Its job is to handle the http request sent by the client. Does this by
@@ -140,7 +159,10 @@ void* handleRequest(void* data) {
     FILE* file; // where we store the results of opening the file
     file = fopen(fileName, "r"); // fileName contains the file name and "r" indicates it is for reading (file pointer points to first location)
 
-    // Step 5 - Store the file and the status code in a variable to send over depending on the 3 outcomes listed above
+    // send the file
+    sendFile(file, sd);
+
+    /* Step 5 - Store the file and the status code in a variable to send over depending on the 3 outcomes listed above
     struct HttpResponse* response = new HttpResponse;
 
     // If the file does not hold null, it means we found it in our directory todo: not sure if this is right?
@@ -180,7 +202,7 @@ void* handleRequest(void* data) {
     write(sd, &responseFile, 4096);
 
     cout << "Made it to post write" << endl;
-
+    */
     close(sd);
     return NULL;
 }

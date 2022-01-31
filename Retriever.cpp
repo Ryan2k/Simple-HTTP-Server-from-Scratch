@@ -107,12 +107,16 @@ void handleRequest(int clientSocket, void* requestMessage) {
 
     char response[4096]; // buffer that reads in the reponse
 
-    read(clientSocket, response, 4096);
+    // create the file we are reading from the server
+    FILE *file;
+    char* fileName;
 
-    cout << "succesfully read in a response" << endl;
+    //read(clientSocket, response, 4096);
+
+    //cout << "succesfully read in a response" << endl;
 
     // todo: convert this back into the HttpResponse object like the server program
-    cout << response << endl;
+    //cout << response << endl;
 }
 
 /*
