@@ -108,6 +108,42 @@ void sendRequest(int clientSocket, char** argv) {
 
 }
 
+void readResponse(int clientSocket, string& file, string& status) {
+    char prev = 0;
+
+    int lineNumber = 1;
+
+    while (1) {
+        string currLine = "";
+        while (1) {
+            char curr = 0;
+
+            recv(clientSocket, &curr, 1, 0);
+
+            if (curr == '\n' || curr == '\r') {
+                if (prev == '\n' || prev == '\r') {
+                    break;
+                }
+            }
+            else {
+                currLine += curr;
+            }
+
+            prev = curr;
+        }
+
+        if (lineNumber == 1) {
+            status += currLine;
+        }
+        else {
+            file += currLine;
+            file += "\r\n";
+        }
+
+        
+    }
+}
+
 int main (int argc, char** argv) {
     // Step 1 - Verify validity of the input
     if (argc != 6) {
@@ -128,4 +164,15 @@ int main (int argc, char** argv) {
 
     // Step 4 - Send the request (Description over the sendRequest Method)
     sendRequest(clientSocket, argv);
+
+    // Step 5 - Read in the response from the server
+    string status = "";
+    string file = "";
+    readResponse(clientSocket, file, status);
+
+    // for debugging
+    cout << "status: " << endl;
+    cout << status << endl;
+    cout << "file contents: " << endl;
+    cout << file << endl;
 }
