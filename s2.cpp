@@ -137,12 +137,14 @@ void* handleRequest(void* data) {
     // Once there, sotre the value of the file name in a variable
     string currLine = " "; // keeps track of the current line of the request we are in
 
-    int lineCounter = 1;
+    int lineCounter = 0;
     
     while (1) {
         // cout << "Entering Line: " << lineCounter << endl;
         lineCounter++;
         currLine = formatHeader(communicationSocket);
+
+        cout << "Line " << lineCounter << ": " << currLine << endl;
 
         // if the current line doesnt have any content, we have reached the end of the buffer
         if (currLine == "") {

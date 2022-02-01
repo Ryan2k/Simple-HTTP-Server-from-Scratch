@@ -185,10 +185,10 @@ int main (int argc, char** argv) {
     readResponse(clientSocket, file, status);
 
     // for debugging
-    cout << "status: " << endl;
-    cout << status << endl;
-    cout << "file contents: " << endl;
-    cout << file << endl;
+    //cout << "status: " << endl;
+    //cout << status << endl;
+    //cout << "file contents: " << endl;
+    //cout << file << endl;
 
     // Step 6 - Save to file if it is 200 OK status
     string fileName = (string)argv[2];
@@ -205,6 +205,9 @@ int main (int argc, char** argv) {
         out.close();
         cout << "Finished writing" << endl; // for debugging
     }
+
+    // Step 7 - Whether or not it was a 404 or 200, print the file to the screen
+    cout << file << endl;
 }
 
 /**
