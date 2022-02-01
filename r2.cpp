@@ -140,12 +140,12 @@ void readResponse(int clientSocket, string& file, string& status) {
             break;
         }
 
-        cout << "line " << lineNumber << ": " << currLine << " Bytes Read = " << bytesRead << endl;
+        //cout << "line " << lineNumber << ": " << currLine << " Bytes Read = " << bytesRead << endl;
 
         if (lineNumber == 1) {
             status += currLine;
         }
-        else {
+        else if (lineNumber > 4){
             file += currLine;
             file += "\r\n";
         }
@@ -155,7 +155,7 @@ void readResponse(int clientSocket, string& file, string& status) {
 
     lineNumber--;
 
-    cout << "Finished Reading " << lineNumber << " lines" << endl;
+    //cout << "Finished Reading " << lineNumber << " lines" << endl;
 }
 
 int main (int argc, char** argv) {
@@ -199,12 +199,12 @@ int main (int argc, char** argv) {
     string statusNum = status.substr(9, 3);
 
     cout << "Status code: " << statusNum << endl;
-    //if (statusNum == "200") {
+    if (statusNum == "200") {
         ofstream out("output.txt", ios_base::out); // todo: change to fileName.c_str()
         out << file;
         out.close();
         cout << "Finished writing" << endl; // for debugging
-    //}
+    }
 }
 
 /**
