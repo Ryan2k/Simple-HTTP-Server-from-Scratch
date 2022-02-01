@@ -106,9 +106,12 @@ void sendRequest(int clientSocket, char** argv) {
         exit (EXIT_FAILURE);
     }
 
+    cout << "Request Sent w/ number of bytes = " << numBytesWritten << endl;
+
 }
 
 void readResponse(int clientSocket, string& file, string& status) {
+    cout << "Entered readResponse() " << endl; // for debugging
     char prev = 0;
 
     int lineNumber = 1;
@@ -140,8 +143,12 @@ void readResponse(int clientSocket, string& file, string& status) {
             file += "\r\n";
         }
 
-        
+        lineNumber++;
     }
+
+    lineNumber--;
+
+    cout << "Finished Reading " << lineNumber << " lines" << endl;
 }
 
 int main (int argc, char** argv) {
