@@ -39,7 +39,7 @@ struct threadData {
  * Pretty much just concattenates each character in a line to a string and once we get to new line, it breaks and returns
  */
 string formatHeader(int comSocket) {
-    string result;
+    string result = "";
     char prev = 0;
 
     while (1) {
