@@ -138,13 +138,15 @@ void* handleRequest(void* data) {
     string currLine = " "; // keeps track of the current line of the request we are in
 
     int lineCounter = 0;
+
+    bool isGetRequest = false; // loops through the lines and if we never find a line that starts with "GET", never true so 400 error
     
     while (1) {
         // cout << "Entering Line: " << lineCounter << endl;
         lineCounter++;
         currLine = formatHeader(communicationSocket);
 
-        cout << "Line " << lineCounter << ": " << currLine << endl;
+        // cout << "Line " << lineCounter << ": " << currLine << endl;
 
         // if the current line doesnt have any content, we have reached the end of the buffer
         if (currLine == "") {
@@ -156,12 +158,21 @@ void* handleRequest(void* data) {
             string reqType;
             input >> reqType >> fileName;
             fileName = fileName.substr(1, fileName.length()); // the file name will have a '/' before it so need to remove that
+            isGetRequest = true;
             break;
 
             // for debugging:
             // cout << "fileName: " << fileName << endl;
             // cout << "reqType: " << reqType << endl;
         }
+    }
+
+    // Setp 3 - If it isnt a get request, should return a 400 status code and nothing else
+    if (!isGetRequest) {
+        string badRequest = "400 Bad Request";
+        send(communicationSocket, &badRequest[0], badRequest.size(), 0);
+        close(communicationSocket);
+        return NULL;
     }
 
     // Step 3 - Process the data based on the rules of the assignment (rules are commented above createResponse() method)
