@@ -191,10 +191,28 @@ int main (int argc, char** argv) {
     cout << file << endl;
 
     // Step 6 - Save to file if it is 200 OK status
+    string fileName = (string)argv[2];
+    fileName = fileName.substr(1);
+
+    cout << "File name: " << fileName << endl;
+
     string statusNum = status.substr(9, 3);
 
     cout << "Status code: " << statusNum << endl;
     if (statusNum == "200") {
-        //ofstream out(fileName, )
+        ofstream out("output.txt", ios_base::out); // todo: change to fileName.c_str()
+        out << file;
+        out.close();
     }
 }
+
+/**
+ * Notes
+ * 
+ * 1. ofstream
+ *  a) Connects with the file system through the operating system and brings back a file handle so I can write a file
+ *  b) The out object becomes a file handle that I can interact with and add content into
+ *  c) Acts the same cout would with stdin (file descriptor 1)
+ *  d) For this we want to close it so that when the program is over we are done writing
+ *  e) Stores the result in the same directory if we dont specify a complete file path
+ */
