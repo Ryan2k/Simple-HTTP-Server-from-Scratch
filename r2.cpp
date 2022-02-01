@@ -199,12 +199,12 @@ int main (int argc, char** argv) {
     string statusNum = status.substr(9, 3);
 
     cout << "Status code: " << statusNum << endl;
-    if (statusNum == "200") {
+    //if (statusNum == "200") {
         ofstream out("output.txt", ios_base::out); // todo: change to fileName.c_str()
         out << file;
         out.close();
         cout << "Finished writing" << endl; // for debugging
-    }
+    //}
 }
 
 /**
