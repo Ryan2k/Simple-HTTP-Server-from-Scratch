@@ -135,6 +135,8 @@ void readResponse(int clientSocket, string& file, string& status) {
             prev = curr;
         }
 
+        cout << "line " << lineNumber << ": " << currLine << endl;
+
         if (lineNumber == 1) {
             status += currLine;
         }
