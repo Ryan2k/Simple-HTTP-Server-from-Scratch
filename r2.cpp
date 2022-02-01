@@ -189,4 +189,12 @@ int main (int argc, char** argv) {
     cout << status << endl;
     cout << "file contents: " << endl;
     cout << file << endl;
+
+    // Step 6 - Save to file if it is 200 OK status
+    string statusNum = status.substr(10, 13);
+
+    cout << "Status code: " << statusNum << endl;
+    if (statusNum == "200") {
+        //ofstream out(fileName, )
+    }
 }
