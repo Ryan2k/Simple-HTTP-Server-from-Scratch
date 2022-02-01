@@ -203,6 +203,7 @@ int main (int argc, char** argv) {
         ofstream out("output.txt", ios_base::out); // todo: change to fileName.c_str()
         out << file;
         out.close();
+        cout << "Finished writing" << endl; // for debugging
     }
 }
 
