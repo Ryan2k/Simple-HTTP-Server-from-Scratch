@@ -145,7 +145,7 @@ void readResponse(int clientSocket, string& file, string& status) {
         if (lineNumber == 1) {
             status += currLine;
         }
-        else {
+        else if (currLine.at(0) == '<') {
             file += currLine;
             file += "\r\n";
         }
