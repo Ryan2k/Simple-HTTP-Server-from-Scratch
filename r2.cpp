@@ -191,7 +191,7 @@ int main (int argc, char** argv) {
     cout << file << endl;
 
     // Step 6 - Save to file if it is 200 OK status
-    string statusNum = status.substr(10, 13);
+    string statusNum = status.substr(9, 3);
 
     cout << "Status code: " << statusNum << endl;
     if (statusNum == "200") {
