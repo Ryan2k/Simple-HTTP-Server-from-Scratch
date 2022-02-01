@@ -115,13 +115,14 @@ void readResponse(int clientSocket, string& file, string& status) {
     char prev = 0;
 
     int lineNumber = 1;
-
+    
     while (1) {
+        int bytesRead;
         string currLine = "";
         while (1) {
             char curr = 0;
 
-            recv(clientSocket, &curr, 1, 0);
+            bytesRead = recv(clientSocket, &curr, 1, 0);
 
             if (curr == '\n' || curr == '\r') {
                 if (prev == '\n' || prev == '\r') {
@@ -135,7 +136,7 @@ void readResponse(int clientSocket, string& file, string& status) {
             prev = curr;
         }
 
-        cout << "line " << lineNumber << ": " << currLine << endl;
+        cout << "line " << lineNumber << ": " << currLine << " Bytes Read = " << bytesRead << endl;
 
         if (lineNumber == 1) {
             status += currLine;
