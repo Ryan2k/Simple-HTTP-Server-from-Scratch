@@ -22,27 +22,201 @@
 #include <fstream>
 #include <stdlib.h>
 #include <arpa/inet.h>
+#include <sstream> // neede for string stream
 
 
 using namespace std;
+
+char* portNumber;
 
 struct threadData {
     int sd;
 };
 
-struct HttpResponse {
-    char* statusLine;
-    FILE* file;
-};
+/**
+ * Takes in the descriptor of the socket between the communication thread and the client
+ * Runs through each line of the request header and formats it to a way the handlRequest() can work with
+ * Pretty much just concattenates each character in a line to a string and once we get to new line, it breaks and returns
+ */
+string formatHeader(int comSocket) {
+    string result = "";
+    char prev = 0;
 
-const char* HTTP_RESPONSE_FORMAT_OUT = "(%s, %s)\n";
+    while (1) {
+        char curr = 0;
+
+        recv(comSocket, &curr, 1, 0);
+
+        if (curr == '\n' || curr == '\r') {
+            if (prev == '\n' || prev == '\r'){
+                break;
+            }
+        }
+        else {
+            result += curr;
+        }
+
+        prev = curr;
+    }
+
+    // cout << "Formatted Header: " << result << endl;
+    return result;
+}
+
+/**
+ * This function takes in the name of the file we parsed out of the http request and tries to find it.
+ * The return variable is a custom object containing 2 variables
+ * 1. A status code - Http status code (ex: "200 Ok" for success or "404 Not found" if unable to find)
+ * 2. The file if we find it or a custom 404 not found file otherwise
+ * There are 5 Possible Outcomes
+ *   a) If the system is able to find the file, opens it, sends it back to the client, and sends a 200 status OK
+ *   b) If not, sends a 404 File not found with a custom file (not found page)
+ *   c) If the name of the file requested is "SecretFile.html" - return a 401 Unauthorized
+ *   d) If the request is for a file that is above the directory where the server is running - return a 403 forbidden
+ *   e) Finally, if the server cannot understand the request - return a 400 bad request
+ *      - This will happen if we get a request type other than get or if the message format is incorrect
+ */
+void createResponse(string fileName, string& status, string& data) {
+    cout << "Entered createResponse() and looking for file: " << fileName << endl;
+    // Step 1 - Initialize the variables that will go in the structure
+    FILE* file;
+
+    // Step 2 - Try to open the given file name in read mode
+    file = fopen(fileName.c_str(), "r");
+
+    // Step 3 - Formulate a response based on the outcome of the open attempt
+
+    // Outcome 1 - The file did not exist so formulate a "404 not found"
+    if (file == NULL) {
+        // a) set the status code
+        status = "HTTP/1.1 404 Not Found\r\n";
+
+        cout << "File Not Found" << endl;
+
+        // b) open the file I created and put in the directory to display for "not found" errors
+        file = fopen("filenotfound.html", "r");
+    }
+    else { // Outcome 2 - File was found, so just set the status to success
+        status = "HTTP/1.1 200 OK\r\n";
+    }
+
+    cout << "opened file and now starting to read " << endl;
+
+    // Step 4 - Write the contents of the file to the string, data. This will represent the payload
+
+    while (!feof (file)) {
+        char curr = fgetc(file);
+
+        if (curr < 0) {
+            continue;
+        }
+
+        data += curr;
+    }
+
+    cout << "Finished Reading File" << endl;
+    cout << data << endl;
+
+    // Step 5 - Finally, close the file
+
+    fclose(file);
+}
+
+// todo: handle a non get request
+// also how to handle that forbidden case (not sure how to check if the file is above the dir)
+void* handleRequest(void* data) {
+    cout << "Entered handleRequest" << endl;
+
+    string fileName = ""; // eventually will extract the name of the file from the data buffer if possible
+
+    // Step 1 - Extract the communication socket from the standardized void* thread function input
+    int communicationSocket = ((struct threadData*)data)->sd; // socket of the current thread and the client program
+
+    // Step 2 - Loop through every line of the request until we get to the line with the request type and file name
+    // The correct format has both of these on the same line
+    // Once there, sotre the value of the file name in a variable
+    string currLine = " "; // keeps track of the current line of the request we are in
+
+    int lineCounter = 0;
+
+    bool isGetRequest = false; // loops through the lines and if we never find a line that starts with "GET", never true so 400 error
+    
+    while (1) {
+        // cout << "Entering Line: " << lineCounter << endl;
+        lineCounter++;
+        currLine = formatHeader(communicationSocket);
+
+        // cout << "Line " << lineCounter << ": " << currLine << endl;
+
+        // if the current line doesnt have any content, we have reached the end of the buffer
+        if (currLine == "") {
+            break;
+        }
+
+        if (currLine.substr(0, 3) == "GET") {
+            istringstream input(currLine); // allows us to access the string in a stream format like cin
+            string reqType;
+            input >> reqType >> fileName;
+            fileName = fileName.substr(1, fileName.length()); // the file name will have a '/' before it so need to remove that
+            isGetRequest = true;
+            break;
+
+            // for debugging:
+            // cout << "fileName: " << fileName << endl;
+            // cout << "reqType: " << reqType << endl;
+        }
+    }
+
+    // Setp 3 - If it isnt a get request, should return a 400 status code and nothing else
+    if (!isGetRequest) {
+        string badRequest = "400 Bad Request";
+        send(communicationSocket, &badRequest[0], badRequest.size(), 0);
+        close(communicationSocket);
+        return NULL;
+    }
+
+    // Step 3 - Process the data based on the rules of the assignment (rules are commented above createResponse() method)
+
+    // Two of the cases commented above dont require a page to be sent back, just a status code, so that will be checked and done here first
+
+    // Case 1 - The request type was not a GET request (Todo: should probably do this before the loop because that specifies GET)
+
+    // Case 2 - The file name was "SecretFile.html, simply return a 401 unathorized" todo
+
+    // If not one of those two cases, just create the response
+    string status = ""; // value of the status code as a string
+    string payload = ""; // value of the files contents as a string
+
+    createResponse(fileName, status, payload);
+
+    string contentLength = to_string(payload.size()); // needed as a reponse header
+
+    string httpResponse = status + "Content_Length: " + contentLength + "\r\n" + "Content-Type: text/html\r\n\r\n" + payload;
+
+    cout << " " << endl;
+    cout << "Full Http Resonse: " << endl;
+    cout << " " << endl;
+    cout << httpResponse << endl;
+
+    // Step 4 - Send the newly formatted http response
+    // the second argument is a void* for a buffer so need to get the pointer to the first character bytes memory address of the response
+    send(communicationSocket, &httpResponse[0], httpResponse.size(), 0);
+
+    // For debugging
+    cout << "Data sent " << endl;
+
+    // Step 5 - Finally, close the socket between the communication process and the client
+    close(communicationSocket);
+
+    return NULL;
+}
 
 /*
  * Takes in the number for the port that this process will be running on and tries to create an address info.
  * From there checks to see if we can make a successful connection, and if so, returns the descriptor of the
  * socket we are creating to listen for connections
  */
-int getSocketDescriptor (char* portNumber) {
+int getSocketDescriptor () {
     // Step 1 - Create hints to get the address information
     struct addrinfo hints; // hints to feed the getaddressinfo function
     memset(&hints, 0, sizeof(struct addrinfo)); // sets all the bytes of hints to 0. Why do we do this?
@@ -91,134 +265,21 @@ int getSocketDescriptor (char* portNumber) {
     exit (EXIT_FAILURE);
 }
 
-/**
- * Takes in the pointer to the file we read in along with the socket with the connection to the client
- * we are currently serving, and sends the file over to the client over the socket.
- */
-void sendFile(FILE* filePointer, int socket) {
-    char data[1024] = {0};
-
-    while (fgets(data, 1024, filePointer) != 0) {
-        if (send(socket, data, 1024, 0) == -1) {
-            cout << "Error Sending Data" << endl;
-            exit (EXIT_FAILURE);
-        }
-
-        bzero(data, 1024);
-    }
-
-    cout << "Successfully sent file!" << endl;
-}
-
-/*
- * This function takes in a socket descriptor for the new connection we create at the bottom of the function below
- * and is ran by a new thread. Its job is to handle the http request sent by the client. Does this by
- * 1. Reading in the buffer information (the get request itself)
- * 2. Checking the system to see if the requested file exits
- * 3. Formulate a response depending on the request
- *    a) If the system is able to find the file, opens it, sends it back to the client, and sends a 200 status OK
- *    b) If not, sends a 404 File not found with a custom file (not found page)
- *    c) If the name of the file requested is "SecretFile.html" - return a 401 Unauthorized
- *    d) If the request is for a file that is above the directory where the server is running - return a 403 forbidden
- *    e) Finally, if the server cannot understand the request - return a 400 bad request
- *       - This will happen if we get a request type other than get or if the message format is incorrect
- */
-void* handleRequest(void* data) {
-    cout << "Entered handleRequest" << endl;
-    // Step 1 - Create buffer to read in the clients write call (read in the get request)
-    int bufferSize = 1024; // max size of the get request is technically double this I believe but we shouldnt need that much
-    char dataBuffer[bufferSize]; // where we are reading the write() call from the client containing the request (char array = string)
-
-    int sd = ((struct threadData*)data)->sd;
-
-    cout << "new socket descriptor: " << sd << endl;
-
-    // Step 2 - Read in the request to the buffer
-    read(sd, dataBuffer, bufferSize); // description of read at the bottom of this file
-
-    cout << "Successfully Read in Content from the Clients Reqeust, Here are the contents: " << endl;
-    cout << dataBuffer << endl; // todo: for now I am just sending the file name but this might change
-
-    // Step 3 - Extract Individual Values from Http Request String (the value inside databuffer)
-    char* currString;
-    currString = strtok(dataBuffer, " ");
-
-    cout << "Request Type: " << currString << endl; // for debugging purposes
-
-    // if the first string is not GET, return a 400 bad request as we only are able to support GET with this program
-    if (strcmp(currString, "GET") != 0) {
-
-    }
-
-    currString = strtok(NULL, " /"); // Grabs the next space seperated string from the buffer (also with a slash as the format is /index.html)
-    char* fileName = currString;
-
-    cout << "fileName: " << fileName << endl;
-
-
-
-    // Step 4 - Try to open the file
-    FILE* file; // where we store the results of opening the file
-    file = fopen(fileName, "r"); // fileName contains the file name and "r" indicates it is for reading (file pointer points to first location)
-
-    // send the file
-    sendFile(file, sd);
-
-    /* Step 5 - Store the file and the status code in a variable to send over depending on the 3 outcomes listed above
-    struct HttpResponse* response = new HttpResponse;
-
-    // If the file does not hold null, it means we found it in our directory todo: not sure if this is right?
-    // So put the file in the structure and give a 200 OK status message
-    if (file == NULL) {
-        response->statusLine = "200 OK";
-        response->file = file;
-    }
-    else { 
-        response->statusLine = "404 Not Found";
-        response->file = file; // this value will just be null
-    }
-
-    // Step 6 - Store this response structure we just created to a file
-    FILE* responseFile;
-    fopen("response.dat", "w+"); // creates a new file called response.dat
-
-    if (file == NULL) {
-        cout << "Couldnt open a file response.dat" << endl;
+int main (int argc, char** argv) {
+    if (argc > 1) {
+        cout << "There should not be any arguments supplied with this program!" << endl;
         exit (EXIT_FAILURE);
     }
 
-    write(sd, (void*)file, 4096); // just for testing
+    // Step 1 - Hardcode the port number
+    portNumber = "8080"; // port number the main thread of this program (listener) is running on
 
-    cout << "created response.dat" << endl;
-
-    fwrite(&response, sizeof(struct HttpResponse), 1, responseFile);
-
-    cout << "successfully wrote to response file" << endl;
-
-    //fprintf(responseFile, HTTP_RESPONSE_FORMAT_OUT, response->statusLine, response->file); // write the structure to the file with the specified format
-    //fseek(responseFile, 0, SEEK_SET); // sets the pointer to the file to the begining
-
-    // todo: not sure how to handle third case or if these two cases above are even correct
-
-    // Step 7 - Send this structure back to the client
-    write(sd, &responseFile, 4096);
-
-    cout << "Made it to post write" << endl;
-    */
-    close(sd);
-    return NULL;
-}
-
-int main (int argc, char** argv) {
-    // Step 1 - Hard code a port number for the process that is listening for connections
-    char* portNumber = "8080"; // http requests generally port 80
-
-    // Step 2 - Create a socket for this process to listen for requests on
-    int serverSocket = getSocketDescriptor(portNumber);
+    // Step 2 - Create a socket for this program to listen on
+    int listeningSocket = getSocketDescriptor();
 
     // Step 3 - Listen on the socket we just created
     // System call to tell the OS we are ready to start listening on the specified port
-    int listening = listen(serverSocket, 5); // 5 is the backlog - the number of open threads it can have
+    int listening = listen(listeningSocket, 5); // 5 is the backlog - the number of open threads it can have
 
     // returns -1 if the listen failed
     if (listening == -1) {
@@ -227,7 +288,7 @@ int main (int argc, char** argv) {
     }
 
     // Once we are successfully listening, print to the console what port we are listening on and that we are
-    cout << "Listening for incoming connections on port " << portNumber << " via descriptor: " << serverSocket << endl;
+    cout << "Listening for incoming connections on port " << portNumber << " via descriptor: " << listeningSocket << endl;
 
     // Step 4 - Create an infinte loop that is listening for connections
     // If successfully able to accept the connection, create another socket to handle the connection (get request) for each client
@@ -235,7 +296,7 @@ int main (int argc, char** argv) {
         struct sockaddr clientAddress;
         socklen_t clientAddressLength = sizeof(clientAddress);
 
-        int newConnectionDescriptor = accept(serverSocket, &clientAddress, &clientAddressLength);
+        int newConnectionDescriptor = accept(listeningSocket, &clientAddress, &clientAddressLength);
     
         if (newConnectionDescriptor == -1) {
             cout << "Failed to accept connection request from client" << endl;
@@ -252,6 +313,7 @@ int main (int argc, char** argv) {
     }
 
     return 0;
+
 }
 
 /*
@@ -273,4 +335,11 @@ int main (int argc, char** argv) {
  *  a) Takes in a name of a file and a mode
  *  b) 6 different modes - read, write, etc.
  *  c) Returns a file pointer if successfull or null if unable to find the file
+ * 
+ * 4. istringstream
+ *  a) Allows us to read from the string as if it wer like cin
+ *  b) It basically allows a sequence of contiguous characters and access to individual parts like a indice
+ *  c) But in the format of a string object
+ * 
+ * 
  */
