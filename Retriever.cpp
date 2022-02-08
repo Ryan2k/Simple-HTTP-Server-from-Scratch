@@ -200,7 +200,7 @@ int main (int argc, char** argv) {
 
     cout << "Status code: " << statusNum << endl;
     if (statusNum == "200") {
-        ofstream out("output.txt", ios_base::out); // todo: change to fileName.c_str()
+        ofstream out(fileName.c_str(), ios_base::out); // todo: change to fileName.c_str()
         out << file;
         out.close();
         cout << "Finished writing" << endl; // for debugging
