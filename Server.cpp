@@ -76,7 +76,7 @@ string formatHeader(int comSocket) {
  *   e) Finally, if the server cannot understand the request - return a 400 bad request
  *      - This will happen if we get a request type other than get or if the message format is incorrect
  */
-void createResponse(string fileName, string& status, string& data) {
+void createResponse(string fileName, string& status, string& data, bool unauthorized) {
     //cout << "Entered createResponse() and looking for file: " << fileName << endl;
     // Step 1 - Initialize the variables that will go in the structure
     FILE* file;
@@ -86,21 +86,26 @@ void createResponse(string fileName, string& status, string& data) {
 
     // Step 3 - Formulate a response based on the outcome of the open attempt
 
-    // Outcome 1 - The file did not exist so formulate a "404 not found"
-    if (file == NULL) {
-        // a) set the status code
+    // if unauthorized, simply return 401 and the file created for it
+    if (unauthorized) {
         status = "HTTP/1.1 404 Not Found\r\n";
-
-        cout << "File Not Found" << endl;
-
-        // b) open the file I created and put in the directory to display for "not found" errors
-        file = fopen("filenotfound.html", "r");
     }
-    else { // Outcome 2 - File was found, so just set the status to success
-        status = "HTTP/1.1 200 OK\r\n";
-    }
+    else {
+        // Outcome 1 - The file did not exist so formulate a "404 not found"
+        if (file == NULL) {
+            // a) set the status code
+            status = "HTTP/1.1 404 Not Found\r\n";
 
-    cout << "opened file and now starting to read " << endl;
+            //cout << "File Not Found" << endl;
+
+            // b) open the file I created and put in the directory to display for "not found" errors
+            file = fopen("filenotfound.html", "r");
+        }
+        else { // Outcome 2 - File was found, so just set the status to success
+            status = "HTTP/1.1 200 OK\r\n";
+        }
+    }
+    // cout << "opened file and now starting to read " << endl;
 
     // Step 4 - Write the contents of the file to the string, data. This will represent the payload
 
@@ -122,7 +127,6 @@ void createResponse(string fileName, string& status, string& data) {
     fclose(file);
 }
 
-// todo: handle a non get request
 // also how to handle that forbidden case (not sure how to check if the file is above the dir)
 void* handleRequest(void* data) {
     cout << "Entered handleRequest" << endl;
@@ -181,13 +185,18 @@ void* handleRequest(void* data) {
 
     // Case 1 - The request type was not a GET request (Todo: should probably do this before the loop because that specifies GET)
 
-    // Case 2 - The file name was "SecretFile.html, simply return a 401 unathorized" todo
+    // Case 2 - The file name was "SecretFile.html, simply return a 401 unathorized" 
+    bool unauthorized = false;
+
+    if (fileName == "SecretFile.html") {
+        unauthorized = true;
+    }
 
     // If not one of those two cases, just create the response
     string status = ""; // value of the status code as a string
     string payload = ""; // value of the files contents as a string
 
-    createResponse(fileName, status, payload);
+    createResponse(fileName, status, payload, unauthorized);
 
     string contentLength = to_string(payload.size()); // needed as a reponse header
 
