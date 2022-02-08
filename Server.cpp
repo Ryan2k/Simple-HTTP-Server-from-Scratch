@@ -77,7 +77,7 @@ string formatHeader(int comSocket) {
  *      - This will happen if we get a request type other than get or if the message format is incorrect
  */
 void createResponse(string fileName, string& status, string& data) {
-    cout << "Entered createResponse() and looking for file: " << fileName << endl;
+    //cout << "Entered createResponse() and looking for file: " << fileName << endl;
     // Step 1 - Initialize the variables that will go in the structure
     FILE* file;
 

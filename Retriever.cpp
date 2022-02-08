@@ -32,9 +32,9 @@ char* fileName;
  */
 int createSocket() {
     // For Debugging
-    cout << "Entered createSocket()" << endl;
-    cout << "port number: " << portNumber << endl;
-    cout << "host name: " << hostName << "!" << endl;
+    //cout << "Entered createSocket()" << endl;
+    //cout << "port number: " << portNumber << endl;
+    //cout << "host name: " << hostName << "!" << endl;
 
     int clientSocket; // return value of the descriptor for the socket we are going to create
 
@@ -84,8 +84,8 @@ void sendRequest(int clientSocket, char** argv) {
     // Step 1 - Format the request in the propper way
     // Http Requests are formatted in the way described in main, however, it is in two seperate lines as shown below
     string requestString = string(argv[1]) + " " + string(argv[2]) + " " + string(argv[3]) + "\r\n" + string(argv[4]) + " " + string(argv[5]) + "\r\n\r\n";
-    cout << "Request Format as String: " << endl;
-    cout << requestString << endl;
+    //cout << "Request Format as String: " << endl;
+    //cout << requestString << endl;
 
     // convert it back to a character array to be able to use the write sys call
     // other alternative was to use str.cpy to save a tiny amount of memory but it wasnt working with the slashes
@@ -93,8 +93,8 @@ void sendRequest(int clientSocket, char** argv) {
     char httpRequest[rLen + 1];
     strcpy(httpRequest, requestString.c_str());
 
-    cout << "Http Request: " << endl;
-    cout << httpRequest << endl;
+    //cout << "Http Request: " << endl;
+    //cout << httpRequest << endl;
 
     // Step 2 - Write the request to the socket
     // Instead of a file descriptor, can simply use the socket descriptor
@@ -106,12 +106,12 @@ void sendRequest(int clientSocket, char** argv) {
         exit (EXIT_FAILURE);
     }
 
-    cout << "Request Sent w/ number of bytes = " << numBytesWritten << endl;
+    //cout << "Request Sent w/ number of bytes = " << numBytesWritten << endl;
 
 }
 
 void readResponse(int clientSocket, string& file, string& status) {
-    cout << "Entered readResponse() " << endl; // for debugging
+    //cout << "Entered readResponse() " << endl; // for debugging
     char prev = 0;
 
     int lineNumber = 1;
@@ -194,7 +194,7 @@ int main (int argc, char** argv) {
     string fileName = (string)argv[2];
     fileName = fileName.substr(1);
 
-    cout << "File name: " << fileName << endl;
+    //cout << "File name: " << fileName << endl;
 
     string statusNum = status.substr(9, 3);
 
