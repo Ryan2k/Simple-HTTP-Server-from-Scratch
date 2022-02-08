@@ -194,7 +194,7 @@ int main (int argc, char** argv) {
     string fileName = (string)argv[2];
     fileName = fileName.substr(1);
 
-    //cout << "File name: " << fileName << endl;
+    cout << "File name: " << fileName << endl;
 
     string statusNum = status.substr(9, 3);
 
