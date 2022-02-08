@@ -88,7 +88,7 @@ void createResponse(string fileName, string& status, string& data, bool unauthor
 
     // if unauthorized, simply return 401 and the file created for it
     if (unauthorized) {
-        status = "HTTP/1.1 404 Not Found\r\n";
+        status = "HTTP/1.1 401 Unauthroized\r\n";
     }
     else {
         // Outcome 1 - The file did not exist so formulate a "404 not found"
