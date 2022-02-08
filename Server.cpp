@@ -190,6 +190,7 @@ void* handleRequest(void* data) {
 
     if (fileName == "SecretFile.html") {
         unauthorized = true;
+        fileName = "unauthorized.html"; // this is the html file that should open if the file is unauthorized
     }
 
     // If not one of those two cases, just create the response
