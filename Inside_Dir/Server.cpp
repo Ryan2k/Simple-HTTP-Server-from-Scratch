@@ -188,7 +188,7 @@ void* handleRequest(void* data) {
         }
     }
 
-    cout << "Read in file past get" << endl;
+    //cout << "Read in file past get" << endl;
 
     bool isBadRequest = false;
 
@@ -234,7 +234,7 @@ void* handleRequest(void* data) {
     send(communicationSocket, &httpResponse[0], httpResponse.size(), 0);
 
     // For debugging
-    cout << "Data sent " << endl;
+    // cout << "Data sent " << endl;
 
     // Step 5 - Finally, close the socket between the communication process and the client
     close(communicationSocket);
@@ -303,7 +303,7 @@ int main (int argc, char** argv) {
     }
 
     // Step 1 - Hardcode the port number
-    portNumber = "80"; // port number the main thread of this program (listener) is running on
+    portNumber = "8080"; // port number the main thread of this program (listener) is running on
 
     // Step 2 - Create a socket for this program to listen on
     int listeningSocket = getSocketDescriptor();
