@@ -109,7 +109,7 @@ void createResponse(string fileName, string& status, string& data, bool unauthor
                 //cout << "File Not Found" << endl;
 
                 // b) open the file I created and put in the directory to display for "not found" errors
-                file = fopen("filenotfound.html", "r");
+                file = fopen("forbidden.html", "r");
             }
         }
         else { // Outcome 2 - File was found, so just set the status to success
