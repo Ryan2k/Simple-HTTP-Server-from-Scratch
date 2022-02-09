@@ -104,12 +104,13 @@ void createResponse(string fileName, string& status, string& data, bool unauthor
             }
             else {
                 // a) set the status code
-                status = "HTTP/1.1 404 Not Found\r\n";
+                //status = "HTTP/1.1 404 Not Found\r\n";
 
                 //cout << "File Not Found" << endl;
 
                 // b) open the file I created and put in the directory to display for "not found" errors
                 file = fopen("forbidden.html", "r");
+                status = "HTTP/1.1 403 Forbidden";
             }
         }
         else { // Outcome 2 - File was found, so just set the status to success
