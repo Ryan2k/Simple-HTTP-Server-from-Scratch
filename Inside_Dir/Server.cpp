@@ -93,13 +93,24 @@ void createResponse(string fileName, string& status, string& data, bool unauthor
     else {
         // Outcome 1 - The file did not exist so formulate a "404 not found"
         if (file == NULL) {
-            // a) set the status code
-            status = "HTTP/1.1 404 Not Found\r\n";
+            string outsideGuess = "/Simple-Http-Server-from-Scratch/" + fileName;
 
-            //cout << "File Not Found" << endl;
+            file = fopen(fileName.c_str(), "r");
 
-            // b) open the file I created and put in the directory to display for "not found" errors
-            file = fopen("filenotfound.html", "r");
+            if (file != NULL) {
+                status = "HTTP/1.1 403 Forbidden";
+                file = fopen("forbidden.html", "r");
+                cout << "forbidden" << endl;
+            }
+            else {
+                // a) set the status code
+                status = "HTTP/1.1 404 Not Found\r\n";
+
+                //cout << "File Not Found" << endl;
+
+                // b) open the file I created and put in the directory to display for "not found" errors
+                file = fopen("filenotfound.html", "r");
+            }
         }
         else { // Outcome 2 - File was found, so just set the status to success
             status = "HTTP/1.1 200 OK\r\n";
