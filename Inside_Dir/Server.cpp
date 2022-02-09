@@ -303,7 +303,7 @@ int main (int argc, char** argv) {
     }
 
     // Step 1 - Hardcode the port number
-    portNumber = "8080"; // port number the main thread of this program (listener) is running on
+    portNumber = "80"; // port number the main thread of this program (listener) is running on
 
     // Step 2 - Create a socket for this program to listen on
     int listeningSocket = getSocketDescriptor();

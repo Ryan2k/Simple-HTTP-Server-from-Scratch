@@ -172,7 +172,7 @@ int main (int argc, char** argv) {
     // Step 2 - Hard Code the port number (80 is typically used for Http Requests but for our custom program, using 8080)
     // This is the port number that the server program I created is running on and listening on for incoming TCP connection requests
     // and parse out the hostname from the input (should always be argv[5] as argv[0] is the filename and hostname is the 5th string)
-    portNumber = "8080";
+    portNumber = "80";
     hostName = argv[5];
 
     // Step 3 - Create a socket between the current program (the client) and the program running on the server
