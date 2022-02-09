@@ -76,7 +76,7 @@ string formatHeader(int comSocket) {
  *   e) Finally, if the server cannot understand the request - return a 400 bad request
  *      - This will happen if we get a request type other than get or if the message format is incorrect
  */
-void createResponse(string fileName, string& status, string& data, bool unauthorized) {
+void createResponse(string fileName, string& status, string& data, bool unauthorized, bool isBadRequest) {
     //cout << "Entered createResponse() and looking for file: " << fileName << endl;
     // Step 1 - Initialize the variables that will go in the structure
     FILE* file;
@@ -86,19 +86,24 @@ void createResponse(string fileName, string& status, string& data, bool unauthor
 
     // Step 3 - Formulate a response based on the outcome of the open attempt
 
+    // if bad request, just do the 400 status and filename is already set to correct one from function who called this
+    if (isBadRequest) {
+        status = "HTTP/1.1 400 Unauthroized\r\n";
+    }
+
     // if unauthorized, simply return 401 and the file created for it
-    if (unauthorized) {
+    if (unauthorized && !isBadRequest) {
         status = "HTTP/1.1 401 Unauthroized\r\n";
     }
-    else {
+    else if (!isBadRequest) {
         // Outcome 1 - The file did not exist so formulate a "404 not found"
         if (file == NULL) {
             string outsideGuess = "/Simple-Http-Server-from-Scratch/" + fileName;
 
-            file = fopen(fileName.c_str(), "r");
+            file = fopen(outsideGuess.c_str(), "r");
 
             if (file != NULL) {
-                status = "HTTP/1.1 403 Forbidden";
+                status = "HTTP/1.1 403 Forbidden\r\n";
                 file = fopen("forbidden.html", "r");
                 cout << "forbidden" << endl;
             }
@@ -109,8 +114,7 @@ void createResponse(string fileName, string& status, string& data, bool unauthor
                 //cout << "File Not Found" << endl;
 
                 // b) open the file I created and put in the directory to display for "not found" errors
-                file = fopen("forbidden.html", "r");
-                status = "HTTP/1.1 403 Forbidden";
+                file = fopen("filenotfound.html", "r");
             }
         }
         else { // Outcome 2 - File was found, so just set the status to success
@@ -166,6 +170,7 @@ void* handleRequest(void* data) {
 
         // if the current line doesnt have any content, we have reached the end of the buffer
         if (currLine == "") {
+            cout << "never got to get" << endl;
             break;
         }
 
@@ -183,12 +188,14 @@ void* handleRequest(void* data) {
         }
     }
 
-    // Setp 3 - If it isnt a get request, should return a 400 status code and nothing else
+    cout << "Read in file past get" << endl;
+
+    bool isBadRequest = false;
+
+    // Setp 3 - If it isnt a get request, should return a 400 bad request along with the html for it
     if (!isGetRequest) {
-        string badRequest = "400 Bad Request";
-        send(communicationSocket, &badRequest[0], badRequest.size(), 0);
-        close(communicationSocket);
-        return NULL;
+        fileName = "badrequest.html";
+        isBadRequest = true;
     }
 
     // Step 3 - Process the data based on the rules of the assignment (rules are commented above createResponse() method)
@@ -200,16 +207,18 @@ void* handleRequest(void* data) {
     // Case 2 - The file name was "SecretFile.html, simply return a 401 unathorized" 
     bool unauthorized = false;
 
-    if (fileName == "SecretFile.html") {
-        unauthorized = true;
-        fileName = "unauthorized.html"; // this is the html file that should open if the file is unauthorized
+    if (!isBadRequest) {
+        if (fileName == "SecretFile.html") {
+            unauthorized = true;
+            fileName = "unauthorized.html"; // this is the html file that should open if the file is unauthorized
+        }
     }
 
     // If not one of those two cases, just create the response
     string status = ""; // value of the status code as a string
     string payload = ""; // value of the files contents as a string
 
-    createResponse(fileName, status, payload, unauthorized);
+    createResponse(fileName, status, payload, unauthorized, isBadRequest);
 
     string contentLength = to_string(payload.size()); // needed as a reponse header
 
