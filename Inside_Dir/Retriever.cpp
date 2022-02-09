@@ -32,7 +32,7 @@ char* fileName;
  */
 int createSocket() {
     // For Debugging
-    //cout << "Entered createSocket()" << endl;
+    cout << "Entered createSocket()" << endl;
     //cout << "port number: " << portNumber << endl;
     //cout << "host name: " << hostName << "!" << endl;
 
@@ -84,8 +84,8 @@ void sendRequest(int clientSocket, char** argv) {
     // Step 1 - Format the request in the propper way
     // Http Requests are formatted in the way described in main, however, it is in two seperate lines as shown below
     string requestString = string(argv[1]) + " " + string(argv[2]) + " " + string(argv[3]) + "\r\n" + string(argv[4]) + " " + string(argv[5]) + "\r\n\r\n";
-    //cout << "Request Format as String: " << endl;
-    //cout << requestString << endl;
+    cout << "Request Format as String: " << endl;
+    cout << requestString << endl;
 
     // convert it back to a character array to be able to use the write sys call
     // other alternative was to use str.cpy to save a tiny amount of memory but it wasnt working with the slashes
@@ -106,12 +106,12 @@ void sendRequest(int clientSocket, char** argv) {
         exit (EXIT_FAILURE);
     }
 
-    //cout << "Request Sent w/ number of bytes = " << numBytesWritten << endl;
+    cout << "Request Sent w/ number of bytes = " << numBytesWritten << endl;
 
 }
 
 void readResponse(int clientSocket, string& file, string& status) {
-    //cout << "Entered readResponse() " << endl; // for debugging
+    cout << "Entered readResponse() " << endl; // for debugging
     char prev = 0;
 
     int lineNumber = 1;
