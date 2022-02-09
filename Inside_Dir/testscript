@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+#Case 1 - 200 OK
+./Retriever GET /index.html HTTP/1.1 Host: csslab12.uwb.edu
+
+#Case 2 - Unauthorized
+./Retriever GET /SecretFile.html HTTP/1.1 Host: csslab12.uwb.edu
+
+#Case 3 - Forbidden
+./Retriever GET /SecretFile.html HTTP/1.1 Host: csslab12.uwb.edu
+
+#Case 4 - File Not Found
+./Retriever GET /filethatdoesntexistanywhere.html HTTP/1.1 Host: csslab12.uwb.edu

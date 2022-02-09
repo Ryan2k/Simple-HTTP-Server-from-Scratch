@@ -161,7 +161,7 @@ void readResponse(int clientSocket, string& file, string& status) {
 
 int main (int argc, char** argv) {
     // Step 1 - Verify validity of the input
-    cout << "argc: " << argc << endl;
+    //cout << "argc: " << argc << endl;
     if (argc != 6) {
         cout << "Arguments were not in the form of a GET Request" << endl;
         cout << "Must pass in 5 space seperated strings in the format: <Request> <Filename> <Http Version> <Host:> <Host Name>" << endl;
