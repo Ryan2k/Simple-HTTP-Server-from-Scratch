@@ -68,6 +68,7 @@ int createSocket() {
 
         // otherwise, if it created a socket, test the connection to see if it actually works
         if (connect(clientSocket, curr->ai_addr, curr->ai_addrlen) != -1) {
+            cout << "created socket: " << clientSocket << endl;
             return clientSocket; // if something other than -1 was returned, it successfully connected so return the descriptor and keep the socket open
         }
 
