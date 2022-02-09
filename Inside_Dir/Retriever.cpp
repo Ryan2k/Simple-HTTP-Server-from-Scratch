@@ -140,7 +140,7 @@ void readResponse(int clientSocket, string& file, string& status) {
             break;
         }
 
-        //cout << "line " << lineNumber << ": " << currLine << " Bytes Read = " << bytesRead << endl;
+        cout << "line " << lineNumber << ": " << currLine << " Bytes Read = " << bytesRead << endl;
 
         if (lineNumber == 1) {
             status += currLine;
